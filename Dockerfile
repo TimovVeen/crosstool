@@ -1,30 +1,24 @@
 FROM docker.io/gentoo/portage:latest AS portage
-FROM docker.io/gentoo/stage3:latest AS buildtime
+FROM docker.io/gentoo/stage3:latest AS crosstool
 
 COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo
 
 RUN echo 'FEATURES="-ipc-sandbox -pid-sandbox -network-sandbox -usersandbox -mount-sandbox -sandbox"' >> /etc/portage/make.conf
 
-RUN emerge -qv --root=/runtime baselayout
-
-# RUN mkdir -p /etc/portage/savedconfig/sys-apps
-# COPY busybox.conf /etc/portage/savedconfig/sys-apps/busybox
-# RUN env USE="savedconfig" emerge -qvk --root=/runtime busybox
-RUN USE="make-symlinks" emerge -qv --root=/runtime busybox
-# RUN ln -s busybox /runtime/bin/sh
-
-RUN emerge -qv --root=/runtime bazelisk
-RUN emerge -qv --root=/runtime gcc
-
 COPY keywords /etc/portage/package.accept_keywords/keywords
 RUN emerge -qv crosstool-ng
 COPY crosstool.conf /usr/share/crosstool-ng/.config
+RUN cd /usr/share/crosstool-ng && ct-ng build
 
-RUN cd /usr/share/crosstool-ng/ && ct-ng build
+FROM docker.io/library/alpine:3.21
+COPY --from=crosstool /opt/cross /opt/cross
+RUN echo 'export PATH=/opt/cross/bin:$PATH' >> /etc/profile
 
-# RUN env-update
+RUN wget https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/bazelisk-linux-amd64 \
+-O /usr/local/bin/bazel
+RUN chmod +x /usr/local/bin/bazel
 
-FROM scratch
-COPY --from=buildtime /runtime /
+RUN apk add libstdc++
+RUN apk add libgcc
 
 CMD ["/bin/sh", "--login"]
