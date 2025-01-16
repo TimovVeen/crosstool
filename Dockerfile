@@ -15,15 +15,11 @@ COPY crosstool.conf /usr/share/crosstool-ng/.config
 RUN cd /usr/share/crosstool-ng && ct-ng build
 
 # emerge packages for devcontainer
-RUN emerge --root=/runtime sys-apps/baselayout
-RUN emerge --root=/runtime busybox
+RUN emerge --root=/runtime sys-apps/baselayout sys-apps/busybox
 RUN ln -s busybox /runtime/bin/sh
 
 # devcontainer buildtools
-RUN emerge --root=/runtime sys-apps/file
-RUN emerge --root=/runtime bazelisk
-RUN emerge --root=/runtime curl
-RUN emerge --root=/runtime make
+RUN emerge --root=/runtime sys-apps/file net-misc/curl dev-build/bazelisk dev-build/make
 
 # set up qemu for arm32 userspace emulation
 RUN emerge qemu
