@@ -27,9 +27,9 @@ RUN emerge --root=/runtime make
 
 # set up qemu for arm32 userspace emulation
 RUN emerge qemu
-RUN cp /usr/bin/qemu-arm /runtime/usr/bin/qemu-arm
+RUN cp /usr/bin/qemu-arm /runtime/usr/bin/qemu-arm-base
 COPY qemu-wrapper.c /qemu-wrapper.c
-RUN gcc -static /qemu-wrapper.c -O3 -s -o /runtime/usr/bin/qemu-wrapper
+RUN gcc -static /qemu-wrapper.c -O3 -s -o /runtime/usr/bin/qemu-arm
 
 # only copy c++ runtime libs from gcc, no full native compiler needed
 RUN cp -r /usr/lib/gcc /runtime/usr/lib/gcc
@@ -38,6 +38,8 @@ RUN cp -r /etc/ld.so.conf.d /runtime/etc/
 
 # add cross compiler to path
 RUN echo 'export PATH=/opt/cross/bin:$PATH' >> /runtime/etc/profile
+RUN echo 'export CC=armv7a-xilinx-linux-musleabi-gcc' >> /runtime/etc/profile
+RUN echo 'export CXX=armv7a-xilinx-linux-musleabi-g++' >> /runtime/etc/profile
 
 FROM scratch
 COPY --from=buildtime /runtime /

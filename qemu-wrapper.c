@@ -12,9 +12,9 @@ int main(int argc, char **argv, char **envp) {
 	newargv[1] = "-cpu";
 	newargv[2] = "cortex-a9";
 	newargv[3] = "-L";
-	newargv[4] = "/usr/armv7a-softfloat-linux-gnueabi";
+	newargv[4] = "/opt/cross/armv7a-xilinx-linux-musleabi/sysroot";
 
 	memcpy(&newargv[5], &argv[1], sizeof(*argv) * (argc -1));
 	newargv[argc + 4] = NULL;
-	return execve("/usr/bin/qemu-arm", newargv, envp);
+	return execve("/usr/bin/qemu-arm-base", newargv, envp);
 }
