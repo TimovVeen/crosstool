@@ -5,20 +5,25 @@ FROM docker.io/gentoo/stage3:latest AS buildtime
 # so copy the package repo to keep it up to date
 COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo
 
-RUN echo 'FEATURES="-ipc-sandbox -pid-sandbox -network-sandbox -usersandbox -mount-sandbox -sandbox"' >> /etc/portage/make.conf
+# copy portage settings
+COPY make.conf /etc/portage/make.conf
+COPY flags /etc/portage/package.use/flags
 
-COPY keywords /etc/portage/package.accept_keywords/keywords
-RUN emerge -qv crosstool-ng
-COPY crosstool.conf /usr/share/crosstool-ng/.config
-RUN cd /usr/share/crosstool-ng && ct-ng build
+# setup cross compiler
+# RUN emerge crosstool-ng
+# COPY crosstool.conf /usr/share/crosstool-ng/.config
+# RUN cd /usr/share/crosstool-ng && ct-ng build
 
-RUN emerge -qv --root=/runtime sys-apps/baselayout
-RUN emerge -qvk --root=/runtime busybox
+# emerge packages for devcontainer
+RUN emerge --root=/runtime sys-apps/baselayout
+RUN emerge --root=/runtime qemu
+RUN emerge --root=/runtime busybox
 RUN ln -s busybox /runtime/bin/sh
-RUN USE="-*" emerge -qv --root=/runtime sys-apps/file
+RUN emerge --root=/runtime sys-apps/file
 
-RUN emerge -qv --root=/runtime bazelisk
-RUN emerge -qv --root=/runtime curl
+RUN emerge --root=/runtime bazelisk
+RUN emerge --root=/runtime curl
+RUN emerge --root=/runtime make
 
 # add cross compiler to path
 RUN echo 'export PATH=/opt/cross/bin:$PATH' >> /runtime/etc/profile

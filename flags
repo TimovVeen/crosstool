@@ -1,5 +1,2 @@
-app-emulation/qemu qemu_user_targets_arm static-user
-dev-libs/glib static-libs
-sys-libs/zlib static-libs
-sys-apps/attr static-libs
-dev-libs/libpcre2 static-libs
+app-emulation/qemu -* python_targets_python3_12 qemu_user_targets_arm static-user
+sys-apps/file -* python_targets_python3_12
