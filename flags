@@ -1,2 +1,2 @@
-app-emulation/qemu -* python_targets_python3_12 qemu_user_targets_arm static-user
+app-emulation/qemu -* python_targets_python3_12 qemu_user_targets_arm static-user xattr
 sys-apps/file -* python_targets_python3_12

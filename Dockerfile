@@ -10,28 +10,34 @@ COPY make.conf /etc/portage/make.conf
 COPY flags /etc/portage/package.use/flags
 
 # setup cross compiler
-# RUN emerge crosstool-ng
-# COPY crosstool.conf /usr/share/crosstool-ng/.config
-# RUN cd /usr/share/crosstool-ng && ct-ng build
+RUN emerge crosstool-ng
+COPY crosstool.conf /usr/share/crosstool-ng/.config
+RUN cd /usr/share/crosstool-ng && ct-ng build
 
 # emerge packages for devcontainer
 RUN emerge --root=/runtime sys-apps/baselayout
-RUN emerge --root=/runtime qemu
 RUN emerge --root=/runtime busybox
 RUN ln -s busybox /runtime/bin/sh
-RUN emerge --root=/runtime sys-apps/file
 
+# devcontainer buildtools
+RUN emerge --root=/runtime sys-apps/file
 RUN emerge --root=/runtime bazelisk
 RUN emerge --root=/runtime curl
 RUN emerge --root=/runtime make
 
-# add cross compiler to path
-RUN echo 'export PATH=/opt/cross/bin:$PATH' >> /runtime/etc/profile
+# set up qemu for arm32 userspace emulation
+RUN emerge qemu
+RUN cp /usr/bin/qemu-arm /runtime/usr/bin/qemu-arm
+COPY qemu-wrapper.c /qemu-wrapper.c
+RUN gcc -static /qemu-wrapper.c -O3 -s -o /runtime/usr/bin/qemu-wrapper
 
 # only copy c++ runtime libs from gcc, no full native compiler needed
 RUN cp -r /usr/lib/gcc /runtime/usr/lib/gcc
 RUN cp -r /etc/env.d/gcc /runtime/etc/env.d/gcc
 RUN cp -r /etc/ld.so.conf.d /runtime/etc/
+
+# add cross compiler to path
+RUN echo 'export PATH=/opt/cross/bin:$PATH' >> /runtime/etc/profile
 
 FROM scratch
 COPY --from=buildtime /runtime /
