@@ -37,6 +37,7 @@ RUN cp -r /etc/ld.so.conf.d /runtime/etc/
 RUN echo 'export PATH=/opt/cross/bin:$PATH' >> /runtime/etc/profile
 RUN echo 'export CC=armv7a-xilinx-linux-musleabi-gcc' >> /runtime/etc/profile
 RUN echo 'export CXX=armv7a-xilinx-linux-musleabi-g++' >> /runtime/etc/profile
+RUN echo 'export PS1="\w: "' >> /runtime/etc/profile
 
 FROM scratch
 COPY --from=buildtime /runtime /
