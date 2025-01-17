@@ -1,6 +1,6 @@
 # pin image tags to ensure reproducable builds
 FROM docker.io/gentoo/portage:20250117 AS portage
-FROM docker.io/gentoo/stage3:musl-20250113 AS buildtime
+FROM docker.io/gentoo/stage3:nomultilib-20250113 AS buildtime
 
 # portage image is more frequently updated than the stage3
 # so copy the package repo to keep it up to date
