@@ -1,5 +1,6 @@
-FROM docker.io/gentoo/portage:latest AS portage
-FROM docker.io/gentoo/stage3:latest AS buildtime
+# pin image tags to ensure reproducable builds
+FROM docker.io/gentoo/portage:20250117 AS portage
+FROM docker.io/gentoo/stage3:20250113 AS buildtime
 
 # portage image is more frequently updated than the stage3
 # so copy the package repo to keep it up to date
@@ -10,17 +11,16 @@ COPY make.conf /etc/portage/make.conf
 COPY flags /etc/portage/package.use/flags
 
 # setup cross compiler
+# make sure the git version of crosstool-ng is masked, since arm64 isn't keyworded
 RUN echo '=sys-devel/crosstool-ng-9999' >> /etc/portage/package.mask/masks
 RUN emerge crosstool-ng
 COPY crosstool.conf /usr/share/crosstool-ng/.config
 RUN cd /usr/share/crosstool-ng && ct-ng build
 
-# emerge packages for devcontainer
-RUN emerge --root=/runtime sys-apps/baselayout sys-apps/busybox
+# devcontainer packages
+RUN emerge --root=/runtime sys-apps/file net-misc/curl dev-build/bazelisk \
+    dev-build/make sys-apps/baselayout sys-apps/busybox
 RUN ln -s busybox /runtime/bin/sh
-
-# devcontainer buildtools
-RUN emerge --root=/runtime sys-apps/file net-misc/curl dev-build/bazelisk dev-build/make
 
 # set up qemu for arm32 userspace emulation
 RUN emerge qemu
@@ -50,4 +50,6 @@ RUN /bin/busybox --list-applets | while read -r; do \
     busybox ln -s "${target}" /${REPLY} &>/dev/null || true; \
     done
 
+VOLUME [ "/project" ]
+WORKDIR /project
 CMD ["/bin/sh", "--login"]
