@@ -10,6 +10,7 @@ COPY make.conf /etc/portage/make.conf
 COPY flags /etc/portage/package.use/flags
 
 # setup cross compiler
+RUN echo '=sys-devel/crosstool-ng-9999' >> /etc/portage/package.mask/masks
 RUN emerge crosstool-ng
 COPY crosstool.conf /usr/share/crosstool-ng/.config
 RUN cd /usr/share/crosstool-ng && ct-ng build
@@ -45,8 +46,8 @@ RUN /sbin/ldconfig
 
 # symlink busybox applets
 RUN /bin/busybox --list-applets | while read -r; do \
-		[ "${REPLY}" = "${REPLY#bin/}" ] && target=../bin/busybox || target=busybox; \
-		busybox ln -s "${target}" /${REPLY} &>/dev/null || true; \
-	done
+    [ "${REPLY}" = "${REPLY#bin/}" ] && target=../bin/busybox || target=busybox; \
+    busybox ln -s "${target}" /${REPLY} &>/dev/null || true; \
+    done
 
 CMD ["/bin/sh", "--login"]
