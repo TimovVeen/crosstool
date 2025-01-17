@@ -1,6 +1,6 @@
 # pin image tags to ensure reproducable builds
 FROM docker.io/gentoo/portage:20250117 AS portage
-FROM docker.io/gentoo/stage3:20250113 AS buildtime
+FROM docker.io/gentoo/stage3:nomultilib-20250113 AS buildtime
 
 # portage image is more frequently updated than the stage3
 # so copy the package repo to keep it up to date
@@ -27,6 +27,8 @@ RUN emerge qemu
 RUN cp /usr/bin/qemu-arm /runtime/usr/bin/qemu-arm-base
 COPY qemu-wrapper.c /qemu-wrapper.c
 RUN gcc -static /qemu-wrapper.c -O3 -s -o /runtime/usr/bin/qemu-arm
+
+RUN emerge --root=/runtime llvm-core/clang
 
 # only copy c++ runtime libs from gcc, no full native compiler needed
 RUN cp -r /usr/lib/gcc /runtime/usr/lib/gcc
