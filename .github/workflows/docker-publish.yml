@@ -112,6 +112,6 @@ jobs:
       - name: Create and push manifest
         run: |
           docker manifest create ${{ env.REGISTRY }}/${{ steps.lower-repo.outputs.repository }}:latest --amend \
-            ${{ env.REGISTRY }}/${{ steps.lower-repo.outputs.repository }}:latest-amd64 \
-            ${{ env.REGISTRY }}/${{ steps.lower-repo.outputs.repository }}:latest-arm64
+            ${{ env.REGISTRY }}/${{ steps.lower-repo.outputs.repository }}-amd64:latest \
+            ${{ env.REGISTRY }}/${{ steps.lower-repo.outputs.repository }}-arm64:latest
           docker manifest push ${{ env.REGISTRY }}/${{ steps.lower-repo.outputs.repository }}:latest
