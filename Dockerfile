@@ -20,7 +20,8 @@ RUN cd /usr/share/crosstool-ng && ct-ng build
 # devcontainer packages
 RUN emerge --root=/runtime sys-apps/baselayout
 RUN mkdir /runtime/usr/bin
-RUN ln -s /runtime/usr/bin /runtime/bin && ln -s /runtime/usr/bin /runtime/sbin
+RUN ln -s ../usr/bin /runtime/bin
+RUN ln -s ../usr/bin /runtime/sbin
 RUN emerge --root=/runtime sys-apps/file net-misc/curl dev-build/bazelisk \
     dev-build/make sys-apps/busybox
 RUN ln -s busybox /runtime/usr/bin/sh
