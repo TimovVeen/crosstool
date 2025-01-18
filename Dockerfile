@@ -18,7 +18,7 @@ COPY crosstool.conf /usr/share/crosstool-ng/.config
 RUN cd /usr/share/crosstool-ng && ct-ng build
 
 # devcontainer packages
-RUN EXTRA_ECONF="SYMLINK_LIB=yes" emerge --root=/runtime sys-apps/baselayout
+RUN emerge --root=/runtime sys-apps/baselayout
 RUN mkdir /runtime/usr/bin
 RUN ln -s /runtime/usr/bin /runtime/bin && ln -s /runtime/usr/bin /runtime/sbin
 RUN emerge --root=/runtime sys-apps/file net-misc/curl dev-build/bazelisk \
