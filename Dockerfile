@@ -23,7 +23,7 @@ RUN mkdir /runtime/usr/bin
 RUN ln -s /runtime/usr/bin /runtime/bin && ln -s /runtime/usr/bin /runtime/sbin
 RUN emerge --root=/runtime sys-apps/file net-misc/curl dev-build/bazelisk \
     dev-build/make sys-apps/busybox
-RUN ln -s busybox /runtime/bin/sh
+RUN ln -s busybox /runtime/usr/bin/sh
 
 # set up qemu for arm32 userspace emulation
 RUN emerge qemu
